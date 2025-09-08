@@ -3,13 +3,14 @@ import mongoose  from 'mongoose';
 import app from './app';
 import dotenv from "dotenv"
 import { envVars } from './app/config/env';
+import { Server } from "http";
 dotenv.config();
 
-let server;
+let server : Server;
 const port = envVars.PORT || 5000; 
 
 // ================== MONGODB CONNECTION ==================
-const connectDB = async () => {
+const startServer = async () => {
   // console.log(envVars.MONGO_URI,"....................."); 
   
   try {
@@ -25,4 +26,54 @@ const connectDB = async () => {
   }
 };
 
-connectDB()
+startServer()
+
+
+process.on("SIGTERM", () => {
+    console.log("SIGTERM signal recieved... Server shutting down..");
+
+    if (server) {
+        server.close(() => {
+            process.exit(1)
+        });
+    }
+
+    process.exit(1)
+})
+
+process.on("SIGINT", () => {
+    console.log("SIGINT signal recieved... Server shutting down..");
+
+    if (server) {
+        server.close(() => {
+            process.exit(1)
+        });
+    }
+
+    process.exit(1)
+})
+
+
+process.on("unhandledRejection", (err) => {
+    console.log("Unhandled Rejecttion detected... Server shutting down..", err);
+
+    if (server) {
+        server.close(() => {
+            process.exit(1)
+        });
+    }
+
+    process.exit(1)
+})
+
+process.on("uncaughtException", (err) => {
+    console.log("Uncaught Exception detected... Server shutting down..", err);
+
+    if (server) {
+        server.close(() => {
+            process.exit(1)
+        });
+    }
+
+    process.exit(1)
+})

@@ -31,5 +31,10 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
+// ==================  Not Found Route HANDLER ==================
+app.use((req, res) => { // use kii kaj kore ?
+  res.status(404).json({ message: "Route not found" });
+});
+
 // ================== EXPORT APP ==================
 export default app;
