@@ -1,40 +1,25 @@
-// app.ts
-import express, { Request, Response, NextFunction } from 'express';
-import cors from 'cors';
+import cors from "cors";
+import express, { Request, Response } from "express";
+import { globalErrorHandler } from "./app/middlewares/globalErrorHandler";
+import notFound from "./app/middlewares/notFound";
+import { router } from "./app/routes";
 
+const app = express()
 
-const app = express();
+app.use(express.json())
+app.use(cors())
 
-// ================== MIDDLEWARES ==================
+app.use("/api/v1", router)
 
-app.use(express.json());
-app.use(cors());
-
-// ================== ROUTES ==================
-
-app.get('/',(req,res)=>{
-  res.send("ph-tour-management server is runing")
+app.get("/", (req: Request, res: Response) => {
+    res.status(200).json({
+        message: "Welcome to Tour Management System Backend"
+    })
 })
 
-// ================== UNKNOWN ROUTE HANDLER ==================
 
-app.use((req: Request, res: Response) => {
-  res.status(404).json({ message: 'Route not found' });
-});
+app.use(globalErrorHandler)
 
-// ================== ERROR HANDLER ==================
+app.use(notFound)
 
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
-    message: err.message || 'Internal Server Error',
-  });
-});
-
-// ==================  Not Found Route HANDLER ==================
-app.use((req, res) => { // use kii kaj kore ?
-  res.status(404).json({ message: "Route not found" });
-});
-
-// ================== EXPORT APP ==================
-export default app;
+export default app

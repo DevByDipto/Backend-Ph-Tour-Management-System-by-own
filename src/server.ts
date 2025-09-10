@@ -1,33 +1,31 @@
-// service.ts
-import mongoose  from 'mongoose';
-import app from './app';
-import dotenv from "dotenv"
-import { envVars } from './app/config/env';
+/* eslint-disable no-console */
 import { Server } from "http";
-dotenv.config();
+import mongoose from "mongoose";
+import app from "./app";
+import { envVars } from "./app/config/env";
+import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 
-let server : Server;
-const port = envVars.PORT || 5000; 
+let server: Server;
 
-// ================== MONGODB CONNECTION ==================
+
 const startServer = async () => {
-  // console.log(envVars.MONGO_URI,"....................."); 
-  
-  try {
-    const mongoURI = envVars.DB_URL;
-    await mongoose.connect(mongoURI); 
-    console.log('MongoDB connected successfully');
- server = app.listen(port, () => {
-  console.log(`Library Management app listening on port ${port}`)
-})
-  } catch (error) {
-    console.error('MongoDB connection failed:', error);
-    // process.exit(1); 
-  }
-};
+    try {
+        await mongoose.connect(envVars.DB_URL)
 
-startServer()
+        console.log("Connected to DB!!");
 
+        server = app.listen(envVars.PORT, () => {
+            console.log(`Server is listening to port ${envVars.PORT}`);
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+(async () => {
+    await startServer()
+    await seedSuperAdmin()
+})()
 
 process.on("SIGTERM", () => {
     console.log("SIGTERM signal recieved... Server shutting down..");
@@ -77,3 +75,17 @@ process.on("uncaughtException", (err) => {
 
     process.exit(1)
 })
+
+// Unhandler rejection error
+// Promise.reject(new Error("I forgot to catch this promise"))
+
+// Uncaught Exception Error
+// throw new Error("I forgot to handle this local erro")
+
+
+/**
+ * unhandled rejection error
+ * uncaught rejection error
+ * signal termination sigterm
+ */
+
